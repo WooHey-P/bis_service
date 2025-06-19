@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../models/bus.dart';
 import '../models/bus_stop.dart';
 
@@ -24,26 +26,29 @@ class BusRouteMap extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // 배경 이미지 (노선도)
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              image: const DecorationImage(
-                image: NetworkImage(
-                  'https://via.placeholder.com/800x600/E8F4FD/2196F3?text=Bus+Route+Map',
-                ),
-                fit: BoxFit.contain,
-              ),
+          // 실제 지도
+          FlutterMap(
+            options: MapOptions(
+              initialCenter: const LatLng(37.5665, 126.9780), // 서울 시청 중심
+              initialZoom: 12.0,
+              minZoom: 10.0,
+              maxZoom: 18.0,
             ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.example.bus_info_service',
+              ),
+              MarkerLayer(
+                markers: [
+                  // 정류장 마커들
+                  ...busStops.map((stop) => _buildBusStopMapMarker(stop)),
+                  // 버스 마커들
+                  ...buses.map((bus) => _buildBusMapMarker(bus)),
+                ],
+              ),
+            ],
           ),
-          
-          // 정류장 표시
-          ...busStops.map((stop) => _buildBusStopMarker(stop)),
-          
-          // 버스 위치 표시
-          ...buses.map((bus) => _buildBusMarker(bus)),
           
           // 범례
           Positioned(
@@ -56,19 +61,20 @@ class BusRouteMap extends StatelessWidget {
     );
   }
 
-  Widget _buildBusStopMarker(BusStop stop) {
-    return Positioned(
-      left: stop.x * 800 - 12, // 이미지 크기에 맞춰 조정
-      top: stop.y * 600 - 12,
+  Marker _buildBusStopMapMarker(BusStop stop) {
+    return Marker(
+      point: LatLng(stop.latitude, stop.longitude),
+      width: 40,
+      height: 40,
       child: Tooltip(
         message: stop.name,
         child: Container(
-          width: 24,
-          height: 24,
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
             color: Colors.green,
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
+            border: Border.all(color: Colors.white, width: 3),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.3),
@@ -80,28 +86,27 @@ class BusRouteMap extends StatelessWidget {
           child: const Icon(
             Icons.location_on,
             color: Colors.white,
-            size: 16,
+            size: 24,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildBusMarker(Bus bus) {
-    final position = onBusPositionCalculate(bus);
-    
-    return Positioned(
-      left: position['x']! * 800 - 16,
-      top: position['y']! * 600 - 16,
+  Marker _buildBusMapMarker(Bus bus) {
+    return Marker(
+      point: LatLng(bus.latitude, bus.longitude),
+      width: 50,
+      height: 50,
       child: Tooltip(
         message: '${bus.routeNumber}번 버스\n상태: ${bus.status}',
         child: Container(
-          width: 32,
-          height: 32,
+          width: 50,
+          height: 50,
           decoration: BoxDecoration(
             color: Colors.blue,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.white, width: 2),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white, width: 3),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.3),
@@ -116,13 +121,13 @@ class BusRouteMap extends StatelessWidget {
               const Icon(
                 Icons.directions_bus,
                 color: Colors.white,
-                size: 16,
+                size: 20,
               ),
               Text(
                 bus.routeNumber,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 8,
+                  fontSize: 10,
                   fontWeight: FontWeight.bold,
                 ),
               ),
