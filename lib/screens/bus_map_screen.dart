@@ -16,10 +16,21 @@ class _BusMapScreenState extends State<BusMapScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<BusProvider>(context, listen: false);
-      provider.loadBusStops();
-      provider.loadBuses();
-      provider.startRealTimeUpdates();
+      _initializeData(provider);
     });
+  }
+
+  Future<void> _initializeData(BusProvider provider) async {
+    await provider.loadBusStops();
+    await provider.loadBuses();
+    provider.startRealTimeUpdates();
+  }
+
+  @override
+  void dispose() {
+    final provider = Provider.of<BusProvider>(context, listen: false);
+    provider.stopRealTimeUpdates();
+    super.dispose();
   }
 
   @override
@@ -31,9 +42,9 @@ class _BusMapScreenState extends State<BusMapScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () {
+            onPressed: () async {
               final provider = Provider.of<BusProvider>(context, listen: false);
-              provider.loadBuses();
+              await provider.loadBuses();
             },
           ),
         ],
@@ -57,9 +68,10 @@ class _BusMapScreenState extends State<BusMapScreen> {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () {
-                      provider.loadBusStops();
-                      provider.loadBuses();
+                    onPressed: () async {
+                      await provider.loadBusStops();
+                      await provider.loadBuses();
+                      provider.startRealTimeUpdates();
                     },
                     child: const Text('다시 시도'),
                   ),

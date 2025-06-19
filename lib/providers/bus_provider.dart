@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/bus.dart';
@@ -6,6 +7,7 @@ import '../services/bus_service.dart';
 
 class BusProvider extends ChangeNotifier {
   final BusService _busService = BusService();
+  Timer? _updateTimer;
   
   List<Bus> _buses = [];
   List<BusStop> _busStops = [];
@@ -33,25 +35,55 @@ class BusProvider extends ChangeNotifier {
   }
 
   Future<void> loadBuses() async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
+    if (_busStops.isEmpty) {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+    }
 
     try {
       _buses = await _busService.getBuses();
+      _error = null;
     } catch (e) {
       _error = e.toString();
     } finally {
-      _isLoading = false;
+      if (_busStops.isEmpty) {
+        _isLoading = false;
+      }
       notifyListeners();
     }
   }
 
   void startRealTimeUpdates() {
-    // 5초마다 버스 위치 업데이트
-    Stream.periodic(const Duration(seconds: 5)).listen((_) {
-      loadBuses();
+    // 기존 타이머가 있다면 취소
+    _updateTimer?.cancel();
+    
+    // 5초마다 버스 위치 업데이트 (백그라운드에서)
+    _updateTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      _loadBusesQuietly();
     });
+  }
+
+  void stopRealTimeUpdates() {
+    _updateTimer?.cancel();
+    _updateTimer = null;
+  }
+
+  Future<void> _loadBusesQuietly() async {
+    try {
+      _buses = await _busService.getBuses();
+      _error = null;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    _updateTimer?.cancel();
+    super.dispose();
   }
 
   // 가장 가까운 정류장 찾기 (실제 지도에서는 필요없지만 호환성을 위해 유지)
