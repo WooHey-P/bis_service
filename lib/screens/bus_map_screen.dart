@@ -10,6 +10,7 @@ class BusMapScreen extends StatefulWidget {
   State<BusMapScreen> createState() => _BusMapScreenState();
 }
 
+
 class _BusMapScreenState extends State<BusMapScreen> {
   @override
   void initState() {
@@ -54,6 +55,28 @@ class _BusMapScreenState extends State<BusMapScreen> {
     final provider = Provider.of<BusProvider>(context, listen: false);
     provider.stopRealTimeUpdates();
     super.dispose();
+  }
+
+  Widget _buildInfoCard(String title, String value, IconData icon, Color color) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -167,6 +190,50 @@ class _BusMapScreenState extends State<BusMapScreen> {
               ],
             );
           }
+
+          return Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                color: Colors.blue.shade50,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildInfoCard(
+                      '운행 중인 버스',
+                      '${provider.buses.length}대',
+                      Icons.directions_bus,
+                      Colors.blue,
+                    ),
+                    _buildInfoCard(
+                      '정류장',
+                      '${provider.busStops.length}개',
+                      Icons.location_on,
+                      Colors.green,
+                    ),
+                    _buildInfoCard(
+                      '마지막 업데이트',
+                      _getLastUpdateTime(provider),
+                      Icons.update,
+                      Colors.orange,
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: BusRouteMap(
+                  buses: provider.buses,
+                  busStops: provider.busStops,
+                  onBusPositionCalculate: provider.getBusPositionOnImage,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
 
           return Column(
             children: [
