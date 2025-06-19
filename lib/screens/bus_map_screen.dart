@@ -17,13 +17,18 @@ class _BusMapScreenState extends State<BusMapScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<BusProvider>(context, listen: false);
       _initializeData(provider);
+      debugPrint('Initialized BusMapScreen with ${provider.busStops.length} stops and ${provider.buses.length} buses');
     });
   }
 
   Future<void> _initializeData(BusProvider provider) async {
+    debugPrint('[INIT] _initializeData started');
     await provider.loadBusStops();
+    debugPrint('[INIT] BusStops loaded: ${provider.busStops.length}');
     await provider.loadBuses();
+    debugPrint('[INIT] Buses loaded: ${provider.buses.length}');
     provider.startRealTimeUpdates();
+    debugPrint('[INIT] Real-time updates started');
   }
 
   @override
