@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web_browser/web_browser.dart';
+import 'package:url_strategy/url_strategy.dart';
 import 'package:provider/provider.dart';
 import 'screens/bus_map_screen.dart';
 import 'providers/bus_provider.dart';
 
 void main() {
+  usePathUrlStrategy();
   runApp(const MyApp());
 }
 
@@ -18,7 +21,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      home: const BusMapScreen(),
+      home: ChangeNotifierProvider(
+        create: (context) => BusProvider()..loadBusStops()..loadBuses(),
+        child: const BusMapScreen(),
+      ),
     );
   }
 }

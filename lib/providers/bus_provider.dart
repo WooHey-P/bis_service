@@ -26,8 +26,10 @@ class BusProvider extends ChangeNotifier {
 
     try {
       _busStops = await _busService.getBusStops();
+      debugPrint("정류장 로드 성공: ${_busStops.length}개");
     } catch (e) {
       _error = e.toString();
+      debugPrint("정류장 로드 실패: $e");
     } finally {
       _isLoading = false;
       notifyListeners();
