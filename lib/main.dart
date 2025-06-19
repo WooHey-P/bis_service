@@ -18,10 +18,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      home: ChangeNotifierProvider(
-        create: (context) => BusProvider()..loadBusStops()..loadBuses(),
-        child: const BusMapScreen(),
-      ),
+      home: const BusMapScreen(),
     );
   }
 }

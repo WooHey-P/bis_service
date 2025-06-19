@@ -14,10 +14,28 @@ class _BusMapScreenState extends State<BusMapScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<BusProvider>(context, listen: false);
-      _initializeData(provider);
-      debugPrint('Initialized BusMapScreen with ${provider.busStops.length} stops and ${provider.buses.length} buses');
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final provider = Provider.of<BusProvider>(context, listen: false);
+        debugPrint('디버깅을 위한 문자열 출력: "Hello, this is a test to check the console output!"');
+        debugPrint('로딩 시 맵 상태를 출력합니다.');
+        
+        debugPrint('버스 정류장 개수: ${provider.busStops.length}');
+        debugPrint('버스 개수: ${provider.buses.length}');
+        
+        // 데이터 로드
+        await provider.loadBusStops();
+        debugPrint('정류장 데이터 로드 완료');
+        
+        await provider.loadBuses();
+        debugPrint('버스 데이터 로드 완료');
+        
+        provider.startRealTimeUpdates();
+        debugPrint('실시간 업데이트 시작');
+        
+      } catch (e) {
+        debugPrint('로딩 중 에러: $e');
+      }
     });
   }
 
@@ -48,42 +66,150 @@ class _BusMapScreenState extends State<BusMapScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () async {
+              debugPrint('[REFRESH] 버스 데이터 새로고침 시작');
               final provider = Provider.of<BusProvider>(context, listen: false);
               await provider.loadBuses();
+              debugPrint('[REFRESH] 버스 데이터 새로고침 완료');
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.bug_report),
+            onPressed: () {
+              debugPrint('[DEBUG] 버스 정보 서비스 디버깅 모드 진입');
+              debugPrint('[DEBUG] 첫 화면 로딩 중');
             },
           ),
         ],
       ),
       body: Consumer<BusProvider>(
         builder: (context, provider, child) {
+          debugPrint('[DEBUG] ${provider.runtimeType} 상태 출력');
+          
           if (provider.isLoading && provider.busStops.isEmpty) {
-            return const Center(
-              child: CircularProgressIndicator(),
+            debugPrint('[DEBUG] 데이터 로딩 중');
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                Positioned(
+                  bottom: 20,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.black40,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '로딩 중... 어며딜로딩 중... 커멘텀 로딩 중...',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                )
+              ],
             );
           }
 
           if (provider.error != null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '오류: ${provider.error}',
-                    style: const TextStyle(color: Colors.red),
+            debugPrint('[DEBUG] 에러 발생: ${provider.error}');
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '오류: ${provider.error}',
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        '문제 해결 방법:\n1. 새로고침(F5)\n2. 다시 시작하기 버튼 클릭\n3. 문제가 지속되면 콘솔에 오류 메시지 확인',
+                        style: const TextStyle(color: Colors.orange),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () async {
+                          debugPrint('[ERROR] 다시 시도 버튼 클릭');
+                          await provider.loadBusStops();
+                          await provider.loadBuses();
+                          debugPrint('[ERROR] 데이터 로드 후 다시 시작');
+                          provider.startRealTimeUpdates();
+                        },
+                        child: const Text('다시 시도'),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await provider.loadBusStops();
-                      await provider.loadBuses();
-                      provider.startRealTimeUpdates();
-                    },
-                    child: const Text('다시 시도'),
+                ),
+                Positioned(
+                  bottom: 20,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.black40,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      provider.error.toString(),
+                      style: const TextStyle(color: Colors.white),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ],
-              ),
+                )
+              ],
             );
           }
+
+          return Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                color: Colors.blue.shade50,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildInfoCard(
+                      '운행 중인 버스',
+                      '${provider.buses.length}대',
+                      Icons.directions_bus,
+                      Colors.blue,
+                    ),
+                    _buildInfoCard(
+                      '정류장',
+                      '${provider.busStops.length}개',
+                      Icons.location_on,
+                      Colors.green,
+                    ),
+                    _buildInfoCard(
+                      '마지막 업데이트',
+                      _getLastUpdateTime(provider),
+                      Icons.update,
+                      Colors.orange,
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: BusRouteMap(
+                  buses: provider.buses,
+                  busStops: provider.busStops,
+                  onBusPositionCalculate: provider.getBusPositionOnImage,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
 
           return Column(
             children: [
