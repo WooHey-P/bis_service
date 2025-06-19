@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer'; // debugPrint를 사용하기 위해 추가
 import 'package:http/http.dart' as http;
 import '../models/bus.dart';
 import '../models/bus_stop.dart';
@@ -7,6 +8,7 @@ class BusService {
   static const String baseUrl = 'https://api.example.com'; // 실제 API URL로 변경
 
   Future<List<BusStop>> getBusStops() async {
+    debugPrint("BusService: getBusStops 호출됨"); // 로그 추가
     try {
       // 실제 API 호출 대신 더미 데이터 반환
       await Future.delayed(const Duration(milliseconds: 500));
@@ -43,6 +45,7 @@ class BusService {
   }
 
   Future<List<Bus>> getBuses() async {
+    debugPrint("BusService: getBuses 호출됨"); // 로그 추가
     try {
       // 실제 API 호출 대신 더미 데이터 반환
       await Future.delayed(const Duration(milliseconds: 300));
