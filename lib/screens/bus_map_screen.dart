@@ -123,7 +123,7 @@ class _BusMapScreenState extends State<BusMapScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.black40,
+                      color: Colors.black38,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -280,7 +280,6 @@ class _BusMapScreenState extends State<BusMapScreen> {
 
           return Column(
             children: [
-              // 상단 정보 패널
               Container(
                 padding: const EdgeInsets.all(16),
                 color: Colors.blue.shade50,
@@ -308,7 +307,6 @@ class _BusMapScreenState extends State<BusMapScreen> {
                   ],
                 ),
               ),
-              // 버스 노선도
               Expanded(
                 child: BusRouteMap(
                   buses: provider.buses,

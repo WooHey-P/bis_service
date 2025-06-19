@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_web_browser/web_browser.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/bus_map_screen.dart';
