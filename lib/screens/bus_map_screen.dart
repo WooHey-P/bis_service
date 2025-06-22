@@ -224,6 +224,7 @@ class _BusMapScreenState extends State<BusMapScreen> {
                 child: BusRouteMap(
                   buses: provider.buses,
                   busStops: provider.busStops,
+                  busRoutes: provider.busRoutes,
                   onBusPositionCalculate: provider.getBusPositionOnImage,
                 ),
               ),
