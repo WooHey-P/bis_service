@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'providers/bus_provider.dart';
 import 'widgets/bus_route_map.dart';
 import 'screens/route_detail_screen.dart';
+import 'widgets/custom_icons.dart';
 
 void main() {
   debugPrint("BIS 애플리케이션 시작");

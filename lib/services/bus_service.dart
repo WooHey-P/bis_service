@@ -247,17 +247,23 @@ class BusService {
       // 버스 진행도 업데이트 (0.1초마다 약간씩 이동)
       _busRouteProgress[busId] = (_busRouteProgress[busId] ?? 0) + (timeDiff ~/ 50);
       
-      // 현재 정류장 인덱스 계산
+      // 현재 정류장 인덱스 계산 (노선의 정류장 순서에 맞게)
       final totalProgress = _busRouteProgress[busId]!;
-      final stationIndex = (totalProgress ~/ 1000) % baseStations.length;
-      final nextStationIndex = (stationIndex + 1) % baseStations.length;
+      final routeStationCount = _getRouteStationCount(routeNumber);
+      final stationIndex = (totalProgress ~/ 1000) % routeStationCount;
+      final nextStationIndex = (stationIndex + 1) % routeStationCount;
       
       // 정류장 간 진행률 (0.0 ~ 1.0)
       final progressBetweenStations = ((totalProgress % 1000) / 1000.0);
       
+      // 실제 노선의 정류장 ID 가져오기
+      final routeStationIds = _getRouteStationIds(routeNumber);
+      final currentStationId = routeStationIds[stationIndex % routeStationIds.length];
+      final nextStationId = routeStationIds[nextStationIndex % routeStationIds.length];
+      
       // 현재 정류장과 다음 정류장의 좌표
-      final currentStation = _mockBusStops[baseStations[stationIndex] % _mockBusStops.length];
-      final nextStation = _mockBusStops[baseStations[nextStationIndex] % _mockBusStops.length];
+      final currentStation = _mockBusStops.firstWhere((s) => s.id == currentStationId);
+      final nextStation = _mockBusStops.firstWhere((s) => s.id == nextStationId);
       
       // 선형 보간으로 현재 위치 계산
       final currentLat = currentStation.latitude + 
@@ -296,5 +302,21 @@ class BusService {
       _busRouteProgress[busId] = random.nextInt(10000); // 0~10초 범위의 랜덤 시작점
       _busDirections[busId] = random.nextDouble() * 360; // 랜덤 방향
     }
+  }
+
+  int _getRouteStationCount(String routeNumber) {
+    final route = _mockBusRoutes.firstWhere(
+      (r) => r.routeNumber == routeNumber,
+      orElse: () => _mockBusRoutes.first,
+    );
+    return route.stationIds.length;
+  }
+
+  List<String> _getRouteStationIds(String routeNumber) {
+    final route = _mockBusRoutes.firstWhere(
+      (r) => r.routeNumber == routeNumber,
+      orElse: () => _mockBusRoutes.first,
+    );
+    return route.stationIds;
   }
 }

@@ -293,7 +293,9 @@ class RouteDetailScreen extends StatelessWidget {
   Widget _buildConnectionLine(List<Bus> buses, int stationIndex, BusRoute route) {
     // 이 구간에 있는 버스들 찾기 (정류장 사이를 이동 중인 버스)
     final busesInSegment = buses.where((bus) {
-      return bus.currentStationIndex == stationIndex;
+      // 버스가 현재 정류장에서 다음 정류장으로 이동 중인지 확인
+      return bus.currentStationIndex == stationIndex && 
+             bus.currentStationIndex < route.stationIds.length - 1;
     }).toList();
     
     return Container(
