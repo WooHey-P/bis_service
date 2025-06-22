@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import '../models/bus.dart';
 import '../models/bus_stop.dart';
 import '../models/bus_route.dart';
+import 'custom_icons.dart';
 
 class BusRouteMap extends StatelessWidget {
   final List<Bus> buses;
@@ -71,66 +72,25 @@ class BusRouteMap extends StatelessWidget {
   Marker _buildBusStopMapMarker(BusStop stop) {
     return Marker(
       point: LatLng(stop.latitude, stop.longitude),
-      width: 50,
-      height: 60,
+      width: 60,
+      height: 80,
       child: Tooltip(
         message: '${stop.name}\n노선: ${stop.routes.join(', ')}',
-        child: Column(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.green.shade400,
-                    Colors.green.shade700,
-                  ],
-                ),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 3),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.green.withOpacity(0.4),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
+        child: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.green.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
               ),
-              child: const Icon(
-                Icons.location_on_rounded,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 2),
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green.shade300),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Text(
-                stop.name,
-                style: TextStyle(
-                  fontSize: 8,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green.shade800,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
+            ],
+          ),
+          child: CustomIcons.busStopIcon(
+            size: 50,
+            color: Colors.green.shade600,
+            stationName: stop.name,
+          ),
         ),
       ),
     );
@@ -139,71 +99,46 @@ class BusRouteMap extends StatelessWidget {
   Marker _buildBusMapMarker(Bus bus) {
     return Marker(
       point: LatLng(bus.latitude, bus.longitude),
-      width: 60,
-      height: 80,
+      width: 70,
+      height: 90,
       child: Tooltip(
         message: '${bus.routeNumber}번 버스\n상태: ${bus.status}\n노선: ${_getRouteName(bus.routeNumber)}',
         child: Column(
           children: [
             Container(
-              width: 50,
-              height: 50,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.blue.shade400,
-                    Colors.blue.shade700,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: Colors.white, width: 3),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.blue.withOpacity(0.4),
                     blurRadius: 8,
-                    offset: const Offset(0, 3),
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.directions_bus_rounded,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                  Text(
-                    bus.routeNumber,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              child: CustomIcons.busIcon(
+                size: 55,
+                color: _getBusColor(bus.routeNumber),
+                routeNumber: bus.routeNumber,
               ),
             ),
+            const SizedBox(height: 4),
             Container(
-              margin: const EdgeInsets.only(top: 2),
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: bus.status == '운행중' ? Colors.green : Colors.orange,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 3,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
               child: Text(
                 bus.status,
                 style: const TextStyle(
-                  fontSize: 8,
+                  fontSize: 9,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -214,6 +149,21 @@ class BusRouteMap extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Color _getBusColor(String routeNumber) {
+    switch (routeNumber) {
+      case '146':
+        return Colors.blue.shade600;
+      case '273':
+        return Colors.green.shade600;
+      case '370':
+        return Colors.orange.shade600;
+      case '502':
+        return Colors.purple.shade600;
+      default:
+        return Colors.blue.shade600;
+    }
   }
 
   String _getRouteName(String routeNumber) {
@@ -275,18 +225,14 @@ class BusRouteMap extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          _buildLegendItem(
-            icon: Icons.location_on_rounded,
-            color: Colors.green.shade600,
+          _buildCustomLegendItem(
+            widget: CustomIcons.busStopIcon(size: 20, color: Colors.green.shade600),
             label: '정류장',
-            isCircle: true,
           ),
           const SizedBox(height: 8),
-          _buildLegendItem(
-            icon: Icons.directions_bus_rounded,
-            color: Colors.blue.shade600,
+          _buildCustomLegendItem(
+            widget: CustomIcons.busIcon(size: 20, color: Colors.blue.shade600),
             label: '버스',
-            isCircle: false,
           ),
           const SizedBox(height: 8),
           Row(
@@ -352,6 +298,31 @@ class BusRouteMap extends StatelessWidget {
             color: Colors.white,
             size: 14,
           ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey.shade700,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCustomLegendItem({
+    required Widget widget,
+    required String label,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          child: widget,
         ),
         const SizedBox(width: 8),
         Text(
