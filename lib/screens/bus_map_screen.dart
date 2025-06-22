@@ -234,7 +234,6 @@ class _BusMapScreenState extends State<BusMapScreen> {
       ),
     );
   }
-  }
 
   Widget _buildInfoCard(String title, String value, IconData icon, Color color) {
     return Card(
