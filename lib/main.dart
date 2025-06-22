@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/bus_provider.dart';
 import 'widgets/bus_route_map.dart';
+import 'screens/route_detail_screen.dart';
 
 void main() {
   debugPrint("BIS 애플리케이션 시작");
@@ -608,10 +609,30 @@ class _BusInfoHomePageState extends State<BusInfoHomePage> {
                       ],
                     ),
                   ),
-                  trailing: Switch(
-                    value: isVisible,
-                    onChanged: (_) => provider.toggleRouteVisibility(route.routeNumber),
-                    activeColor: Color(int.parse(route.color.substring(1), radix: 16) + 0xFF000000),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.info_outline_rounded,
+                          color: Color(int.parse(route.color.substring(1), radix: 16) + 0xFF000000),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RouteDetailScreen(route: route),
+                            ),
+                          );
+                        },
+                        tooltip: '노선 상세 보기',
+                      ),
+                      Switch(
+                        value: isVisible,
+                        onChanged: (_) => provider.toggleRouteVisibility(route.routeNumber),
+                        activeColor: Color(int.parse(route.color.substring(1), radix: 16) + 0xFF000000),
+                      ),
+                    ],
                   ),
                 ),
               );
