@@ -104,8 +104,8 @@ class BusProvider extends ChangeNotifier {
     // 기존 타이머가 있다면 취소
     _updateTimer?.cancel();
     
-    // 5초마다 버스 위치 업데이트 (백그라운드에서)
-    _updateTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+    // 0.1초마다 버스 위치 업데이트 (실시간 시뮬레이션)
+    _updateTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       _loadBusesQuietly();
     });
   }
