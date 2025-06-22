@@ -11,13 +11,19 @@ class BusProvider extends ChangeNotifier {
   
   List<Bus> _buses = [];
   List<BusStop> _busStops = [];
+  List<BusStop> _searchResults = [];
   bool _isLoading = false;
+  bool _isSearching = false;
   String? _error;
+  String _searchQuery = '';
 
   List<Bus> get buses => _buses;
   List<BusStop> get busStops => _busStops;
+  List<BusStop> get searchResults => _searchResults;
   bool get isLoading => _isLoading;
+  bool get isSearching => _isSearching;
   String? get error => _error;
+  String get searchQuery => _searchQuery;
 
   Future<void> loadBusStops() async {
     _isLoading = true;
@@ -56,6 +62,44 @@ class BusProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> searchStations(String query) async {
+    _searchQuery = query;
+    _isSearching = true;
+    notifyListeners();
+
+    try {
+      _searchResults = await _busService.searchStations(query);
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isSearching = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadNearbyStations(double latitude, double longitude) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _searchResults = await _busService.getNearbyStations(latitude, longitude);
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void clearSearch() {
+    _searchQuery = '';
+    _searchResults = [];
+    notifyListeners();
+  }
+
   void startRealTimeUpdates() {
     // 기존 타이머가 있다면 취소
     _updateTimer?.cancel();
@@ -80,6 +124,29 @@ class BusProvider extends ChangeNotifier {
       _error = e.toString();
       notifyListeners();
     }
+  }
+
+  // 특정 정류장을 지나는 버스들 가져오기
+  List<Bus> getBusesForStation(String stationId) {
+    final station = _busStops.firstWhere(
+      (stop) => stop.id == stationId,
+      orElse: () => BusStop(
+        id: '',
+        name: '',
+        latitude: 0,
+        longitude: 0,
+        x: 0,
+        y: 0,
+        routes: [],
+      ),
+    );
+    
+    return _buses.where((bus) => station.routes.contains(bus.routeNumber)).toList();
+  }
+
+  // 특정 노선의 버스들 가져오기
+  List<Bus> getBusesForRoute(String routeNumber) {
+    return _buses.where((bus) => bus.routeNumber == routeNumber).toList();
   }
 
   @override
