@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/bus_provider.dart';
+import 'widgets/bus_route_map.dart';
 
 void main() {
   debugPrint("BIS 애플리케이션 시작");
@@ -111,65 +112,140 @@ class _BusInfoHomePageState extends State<BusInfoHomePage> {
             );
           }
 
-          return Column(
+          return Stack(
             children: [
-              // 검색 바
-              Container(
-                padding: const EdgeInsets.all(16),
-                color: Colors.blue.shade50,
-                child: TextField(
-                  decoration: const InputDecoration(
-                    hintText: '정류장 이름을 검색하세요',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.white,
+              // 메인 지도 화면
+              BusRouteMap(
+                buses: provider.buses,
+                busStops: provider.busStops,
+                onBusPositionCalculate: provider.getBusPositionOnImage,
+              ),
+              
+              // 상단 검색 바와 정보 패널
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  onChanged: (query) {
-                    if (query.isNotEmpty) {
-                      provider.searchStations(query);
-                    } else {
-                      provider.clearSearch();
-                    }
-                  },
+                  child: Column(
+                    children: [
+                      // 검색 바
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        child: TextField(
+                          decoration: const InputDecoration(
+                            hintText: '정류장 이름을 검색하세요',
+                            prefixIcon: Icon(Icons.search),
+                            border: OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          onChanged: (query) {
+                            if (query.isNotEmpty) {
+                              provider.searchStations(query);
+                            } else {
+                              provider.clearSearch();
+                            }
+                          },
+                        ),
+                      ),
+                      
+                      // 정보 카드들
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildInfoCard(
+                              '운행 중인 버스',
+                              '${provider.buses.length}대',
+                              Icons.directions_bus,
+                              Colors.blue,
+                            ),
+                            _buildInfoCard(
+                              '정류장',
+                              '${provider.busStops.length}개',
+                              Icons.location_on,
+                              Colors.green,
+                            ),
+                            _buildInfoCard(
+                              '마지막 업데이트',
+                              _getLastUpdateTime(provider),
+                              Icons.update,
+                              Colors.orange,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               
-              // 정보 카드들
-              Container(
-                padding: const EdgeInsets.all(16),
-                color: Colors.blue.shade50,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildInfoCard(
-                      '운행 중인 버스',
-                      '${provider.buses.length}대',
-                      Icons.directions_bus,
-                      Colors.blue,
+              // 검색 결과 패널 (검색 시에만 표시)
+              if (provider.searchQuery.isNotEmpty)
+                Positioned(
+                  top: 160, // 검색바와 정보카드 아래
+                  left: 16,
+                  right: 16,
+                  bottom: 16,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    _buildInfoCard(
-                      '정류장',
-                      '${provider.busStops.length}개',
-                      Icons.location_on,
-                      Colors.green,
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(8),
+                              topRight: Radius.circular(8),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '검색 결과',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () => provider.clearSearch(),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildSearchResults(provider),
+                        ),
+                      ],
                     ),
-                    _buildInfoCard(
-                      '마지막 업데이트',
-                      _getLastUpdateTime(provider),
-                      Icons.update,
-                      Colors.orange,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-              
-              // 정류장 목록 또는 검색 결과
-              Expanded(
-                child: provider.searchQuery.isNotEmpty
-                    ? _buildSearchResults(provider)
-                    : _buildStationList(provider),
-              ),
             ],
           );
         },
@@ -204,31 +280,6 @@ class _BusInfoHomePageState extends State<BusInfoHomePage> {
     );
   }
 
-  Widget _buildStationList(BusProvider provider) {
-    return ListView.builder(
-      itemCount: provider.busStops.length,
-      itemBuilder: (context, index) {
-        final station = provider.busStops[index];
-        final busesAtStation = provider.getBusesForStation(station.id);
-        
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: ListTile(
-            leading: const Icon(Icons.location_on, color: Colors.green),
-            title: Text(station.name),
-            subtitle: Text('노선: ${station.routes.join(', ')} | 운행 중: ${busesAtStation.length}대'),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              // TODO: 정류장 상세 화면으로 이동
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${station.name} 상세 정보 (구현 예정)')),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
 
   Widget _buildSearchResults(BusProvider provider) {
     if (provider.isSearching) {
@@ -242,22 +293,27 @@ class _BusInfoHomePageState extends State<BusInfoHomePage> {
     }
 
     return ListView.builder(
+      padding: const EdgeInsets.all(8),
       itemCount: provider.searchResults.length,
       itemBuilder: (context, index) {
         final station = provider.searchResults[index];
         final busesAtStation = provider.getBusesForStation(station.id);
         
         return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          margin: const EdgeInsets.symmetric(vertical: 4),
           child: ListTile(
             leading: const Icon(Icons.search, color: Colors.blue),
             title: Text(station.name),
             subtitle: Text('노선: ${station.routes.join(', ')} | 운행 중: ${busesAtStation.length}대'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
-              // TODO: 정류장 상세 화면으로 이동
+              // 검색 결과를 닫고 해당 정류장으로 지도 이동
+              provider.clearSearch();
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${station.name} 상세 정보 (구현 예정)')),
+                SnackBar(
+                  content: Text('${station.name}으로 지도를 이동했습니다'),
+                  duration: const Duration(seconds: 2),
+                ),
               );
             },
           ),
