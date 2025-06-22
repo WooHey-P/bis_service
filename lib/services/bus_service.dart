@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import '../models/bus.dart';
 import '../models/bus_stop.dart';
+import '../models/bus_route.dart';
 
 class BusService {
   static const String baseUrl = 'http://localhost:3000/api'; // Node.js 서버 URL
@@ -41,6 +42,83 @@ class BusService {
     BusStop(id: 'station_030', name: '구로디지털단지', latitude: 37.4851, longitude: 126.9015, x: 0.12, y: 0.62, routes: ['146', '273']),
   ];
 
+  static final List<BusRoute> _mockBusRoutes = [
+    BusRoute(
+      id: 'route_146',
+      routeNumber: '146',
+      routeName: '강남역-노원',
+      stationIds: ['station_002', 'station_005', 'station_001', 'station_004', 'station_006', 'station_014', 'station_020', 'station_022', 'station_024', 'station_018', 'station_016'],
+      coordinates: [
+        RouteCoordinate(latitude: 37.4979, longitude: 127.0276),
+        RouteCoordinate(latitude: 37.5636, longitude: 126.9834),
+        RouteCoordinate(latitude: 37.5665, longitude: 126.9780),
+        RouteCoordinate(latitude: 37.5703, longitude: 126.9925),
+        RouteCoordinate(latitude: 37.5714, longitude: 127.0098),
+        RouteCoordinate(latitude: 37.5615, longitude: 127.0374),
+        RouteCoordinate(latitude: 37.5823, longitude: 127.0015),
+        RouteCoordinate(latitude: 37.5759, longitude: 126.9852),
+        RouteCoordinate(latitude: 37.5720, longitude: 126.9769),
+        RouteCoordinate(latitude: 37.6133, longitude: 127.0288),
+        RouteCoordinate(latitude: 37.6542, longitude: 127.0568),
+      ],
+      color: '#2196F3',
+    ),
+    BusRoute(
+      id: 'route_273',
+      routeNumber: '273',
+      routeName: '홍대입구-강남역',
+      stationIds: ['station_003', 'station_007', 'station_011', 'station_001', 'station_005', 'station_006', 'station_012', 'station_009', 'station_002'],
+      coordinates: [
+        RouteCoordinate(latitude: 37.5563, longitude: 126.9236),
+        RouteCoordinate(latitude: 37.5596, longitude: 126.9425),
+        RouteCoordinate(latitude: 37.5219, longitude: 126.9245),
+        RouteCoordinate(latitude: 37.5665, longitude: 126.9780),
+        RouteCoordinate(latitude: 37.5636, longitude: 126.9834),
+        RouteCoordinate(latitude: 37.5714, longitude: 127.0098),
+        RouteCoordinate(latitude: 37.5401, longitude: 127.0695),
+        RouteCoordinate(latitude: 37.5274, longitude: 127.0280),
+        RouteCoordinate(latitude: 37.4979, longitude: 127.0276),
+      ],
+      color: '#4CAF50',
+    ),
+    BusRoute(
+      id: 'route_370',
+      routeNumber: '370',
+      routeName: '시청앞-성수',
+      stationIds: ['station_001', 'station_004', 'station_023', 'station_007', 'station_003', 'station_011', 'station_019', 'station_021', 'station_013'],
+      coordinates: [
+        RouteCoordinate(latitude: 37.5665, longitude: 126.9780),
+        RouteCoordinate(latitude: 37.5703, longitude: 126.9925),
+        RouteCoordinate(latitude: 37.5758, longitude: 126.9769),
+        RouteCoordinate(latitude: 37.5596, longitude: 126.9425),
+        RouteCoordinate(latitude: 37.5563, longitude: 126.9236),
+        RouteCoordinate(latitude: 37.5219, longitude: 126.9245),
+        RouteCoordinate(latitude: 37.5894, longitude: 127.0167),
+        RouteCoordinate(latitude: 37.5817, longitude: 127.0028),
+        RouteCoordinate(latitude: 37.5445, longitude: 127.0557),
+      ],
+      color: '#FF9800',
+    ),
+    BusRoute(
+      id: 'route_502',
+      routeNumber: '502',
+      routeName: '잠실-금천구청',
+      stationIds: ['station_010', 'station_008', 'station_015', 'station_007', 'station_017', 'station_019', 'station_021', 'station_027', 'station_029'],
+      coordinates: [
+        RouteCoordinate(latitude: 37.5133, longitude: 127.1000),
+        RouteCoordinate(latitude: 37.5345, longitude: 126.9947),
+        RouteCoordinate(latitude: 37.5299, longitude: 126.9649),
+        RouteCoordinate(latitude: 37.5596, longitude: 126.9425),
+        RouteCoordinate(latitude: 37.6369, longitude: 127.0252),
+        RouteCoordinate(latitude: 37.5894, longitude: 127.0167),
+        RouteCoordinate(latitude: 37.5817, longitude: 127.0028),
+        RouteCoordinate(latitude: 37.5581, longitude: 126.9989),
+        RouteCoordinate(latitude: 37.4568, longitude: 126.8956),
+      ],
+      color: '#9C27B0',
+    ),
+  ];
+
   Future<List<BusStop>> getBusStops() async {
     debugPrint("BusService: getBusStops 호출됨");
     try {
@@ -50,6 +128,18 @@ class BusService {
       return _mockBusStops;
     } catch (e) {
       throw Exception('정류장 정보를 불러오는데 실패했습니다: $e');
+    }
+  }
+
+  Future<List<BusRoute>> getBusRoutes() async {
+    debugPrint("BusService: getBusRoutes 호출됨");
+    try {
+      // 실제 API 호출 시뮬레이션
+      await Future.delayed(const Duration(milliseconds: 300));
+      
+      return _mockBusRoutes;
+    } catch (e) {
+      throw Exception('버스 노선 정보를 불러오는데 실패했습니다: $e');
     }
   }
 

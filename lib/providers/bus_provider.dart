@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/bus.dart';
 import '../models/bus_stop.dart';
+import '../models/bus_route.dart';
 import '../services/bus_service.dart';
 
 class BusProvider extends ChangeNotifier {
@@ -11,19 +12,29 @@ class BusProvider extends ChangeNotifier {
   
   List<Bus> _buses = [];
   List<BusStop> _busStops = [];
+  List<BusRoute> _busRoutes = [];
   List<BusStop> _searchResults = [];
   bool _isLoading = false;
   bool _isSearching = false;
   String? _error;
   String _searchQuery = '';
+  
+  // Visibility controls
+  final Set<String> _visibleRoutes = {};
+  final Set<String> _visibleBuses = {};
+  final Set<String> _visibleStations = {};
 
   List<Bus> get buses => _buses;
   List<BusStop> get busStops => _busStops;
+  List<BusRoute> get busRoutes => _busRoutes;
   List<BusStop> get searchResults => _searchResults;
   bool get isLoading => _isLoading;
   bool get isSearching => _isSearching;
   String? get error => _error;
   String get searchQuery => _searchQuery;
+  Set<String> get visibleRoutes => _visibleRoutes;
+  Set<String> get visibleBuses => _visibleBuses;
+  Set<String> get visibleStations => _visibleStations;
 
   Future<void> loadBusStops() async {
     _isLoading = true;
@@ -32,6 +43,8 @@ class BusProvider extends ChangeNotifier {
 
     try {
       _busStops = await _busService.getBusStops();
+      // Initialize all stations as visible
+      _visibleStations.addAll(_busStops.map((station) => station.id));
       debugPrint("정류장 로드 성공: ${_busStops.length}개");
     } catch (e) {
       _error = e.toString();
@@ -40,6 +53,19 @@ class BusProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> loadBusRoutes() async {
+    try {
+      _busRoutes = await _busService.getBusRoutes();
+      // Initialize all routes as visible
+      _visibleRoutes.addAll(_busRoutes.map((route) => route.routeNumber));
+      debugPrint("버스 노선 로드 성공: ${_busRoutes.length}개");
+    } catch (e) {
+      _error = e.toString();
+      debugPrint("버스 노선 로드 실패: $e");
+    }
+    notifyListeners();
   }
 
   Future<void> loadBuses() async {
@@ -51,6 +77,8 @@ class BusProvider extends ChangeNotifier {
 
     try {
       _buses = await _busService.getBuses();
+      // Initialize all buses as visible
+      _visibleBuses.addAll(_buses.map((bus) => bus.id));
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -181,4 +209,67 @@ class BusProvider extends ChangeNotifier {
   double _degreesToRadians(double degrees) {
     return degrees * (pi / 180);
   }
+
+  // Visibility control methods
+  void toggleRouteVisibility(String routeNumber) {
+    if (_visibleRoutes.contains(routeNumber)) {
+      _visibleRoutes.remove(routeNumber);
+    } else {
+      _visibleRoutes.add(routeNumber);
+    }
+    notifyListeners();
+  }
+
+  void toggleBusVisibility(String busId) {
+    if (_visibleBuses.contains(busId)) {
+      _visibleBuses.remove(busId);
+    } else {
+      _visibleBuses.add(busId);
+    }
+    notifyListeners();
+  }
+
+  void toggleStationVisibility(String stationId) {
+    if (_visibleStations.contains(stationId)) {
+      _visibleStations.remove(stationId);
+    } else {
+      _visibleStations.add(stationId);
+    }
+    notifyListeners();
+  }
+
+  void showAllRoutes() {
+    _visibleRoutes.addAll(_busRoutes.map((route) => route.routeNumber));
+    notifyListeners();
+  }
+
+  void hideAllRoutes() {
+    _visibleRoutes.clear();
+    notifyListeners();
+  }
+
+  void showAllBuses() {
+    _visibleBuses.addAll(_buses.map((bus) => bus.id));
+    notifyListeners();
+  }
+
+  void hideAllBuses() {
+    _visibleBuses.clear();
+    notifyListeners();
+  }
+
+  void showAllStations() {
+    _visibleStations.addAll(_busStops.map((station) => station.id));
+    notifyListeners();
+  }
+
+  void hideAllStations() {
+    _visibleStations.clear();
+    notifyListeners();
+  }
+
+  // Get filtered data based on visibility
+  List<Bus> get visibleBusesData => _buses.where((bus) => _visibleBuses.contains(bus.id)).toList();
+  List<BusStop> get visibleStationsData => _busStops.where((station) => _visibleStations.contains(station.id)).toList();
+  List<BusRoute> get visibleRoutesData => _busRoutes.where((route) => _visibleRoutes.contains(route.routeNumber)).toList();
 }

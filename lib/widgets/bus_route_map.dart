@@ -3,16 +3,19 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/bus.dart';
 import '../models/bus_stop.dart';
+import '../models/bus_route.dart';
 
 class BusRouteMap extends StatelessWidget {
   final List<Bus> buses;
   final List<BusStop> busStops;
+  final List<BusRoute> busRoutes;
   final Map<String, double> Function(Bus) onBusPositionCalculate;
 
   const BusRouteMap({
     super.key,
     required this.buses,
     required this.busStops,
+    required this.busRoutes,
     required this.onBusPositionCalculate,
   });
 
@@ -38,6 +41,10 @@ class BusRouteMap extends StatelessWidget {
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.bus_info_service',
+              ),
+              // 버스 노선 폴리라인들
+              PolylineLayer(
+                polylines: busRoutes.map((route) => _buildRoutePolyline(route)).toList(),
               ),
               MarkerLayer(
                 markers: [
@@ -138,6 +145,15 @@ class BusRouteMap extends StatelessWidget {
     );
   }
 
+  Polyline _buildRoutePolyline(BusRoute route) {
+    return Polyline(
+      points: route.coordinates.map((coord) => LatLng(coord.latitude, coord.longitude)).toList(),
+      strokeWidth: 4.0,
+      color: Color(int.parse(route.color.substring(1), radix: 16) + 0xFF000000),
+      pattern: const StrokePattern.solid(),
+    );
+  }
+
   Widget _buildLegend() {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -200,6 +216,21 @@ class BusRouteMap extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               const Text('버스'),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 16,
+                height: 2,
+                decoration: const BoxDecoration(
+                  color: Colors.blue,
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text('버스 노선'),
             ],
           ),
         ],
