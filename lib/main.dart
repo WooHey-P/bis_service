@@ -20,14 +20,88 @@ class BusInfoApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BusProvider()),
       ],
       child: MaterialApp(
-        title: '버스 정보 서비스 (BIS)',
+        title: 'Transit Intelligence System',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
           useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF1565C0),
+            brightness: Brightness.light,
+          ),
           appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.blue,
+            backgroundColor: Color(0xFF0D47A1),
             foregroundColor: Colors.white,
+            elevation: 0,
+            centerTitle: false,
+            titleTextStyle: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          cardTheme: CardTheme(
             elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            color: Colors.white,
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: Colors.grey.shade50,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF1565C0), width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          ),
+          textTheme: const TextTheme(
+            headlineLarge: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF0D47A1),
+            ),
+            headlineMedium: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1565C0),
+            ),
+            titleLarge: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF263238),
+            ),
+            titleMedium: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF37474F),
+            ),
+            bodyLarge: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF455A64),
+            ),
+            bodyMedium: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF607D8B),
+            ),
           ),
         ),
         home: const BusInfoHomePage(),
@@ -67,40 +141,77 @@ class _BusInfoHomePageState extends State<BusInfoHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
+                color: Colors.white.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1,
+                ),
               ),
-              child: const Icon(Icons.directions_bus, size: 24),
+              child: const Icon(
+                Icons.directions_transit_rounded,
+                size: 24,
+                color: Colors.white,
+              ),
             ),
-            const SizedBox(width: 12),
-            const Text('버스 정보 서비스 (BIS)', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Transit Intelligence',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  'Real-time Bus Information System',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white.withOpacity(0.8),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
+        backgroundColor: const Color(0xFF0D47A1),
         elevation: 0,
-        backgroundColor: Colors.blue.shade700,
         actions: [
           Container(
-            margin: const EdgeInsets.only(right: 8),
+            margin: const EdgeInsets.only(right: 16),
             child: IconButton(
               icon: Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1,
+                  ),
                 ),
-                child: const Icon(Icons.refresh, size: 20),
+                child: const Icon(
+                  Icons.refresh_rounded,
+                  size: 20,
+                  color: Colors.white,
+                ),
               ),
               onPressed: () {
                 final provider = Provider.of<BusProvider>(context, listen: false);
                 provider.loadBuses();
               },
-              tooltip: '데이터 새로고침',
+              tooltip: 'Refresh Data',
             ),
           ),
         ],
@@ -143,34 +254,31 @@ class _BusInfoHomePageState extends State<BusInfoHomePage> {
 
           return Row(
             children: [
-              // 왼쪽 패널
+              // Professional Left Panel
               Container(
-                width: 380,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.grey.shade50,
-                      Colors.grey.shade100,
-                    ],
-                  ),
+                width: 420,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(2, 0),
+                      color: Color(0x1A000000),
+                      blurRadius: 24,
+                      offset: Offset(4, 0),
                     ),
                   ],
                 ),
                 child: _buildLeftPanel(provider),
               ),
               
-              // 메인 지도 화면
+              // Main Map Area
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300, width: 1),
+                    color: Colors.grey.shade100,
+                    border: Border.all(
+                      color: const Color(0xFFE0E7FF),
+                      width: 1,
+                    ),
                   ),
                   child: BusRouteMap(
                     buses: provider.visibleBusesData,
@@ -267,104 +375,146 @@ class _BusInfoHomePageState extends State<BusInfoHomePage> {
   Widget _buildLeftPanel(BusProvider provider) {
     return Column(
       children: [
-        // 상단 정보 카드들
+        // Professional Header Section
         Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
+          padding: const EdgeInsets.all(24),
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.blue.shade600,
-                Colors.blue.shade700,
+                Color(0xFF0D47A1),
+                Color(0xFF1565C0),
               ],
             ),
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 실시간 상태 표시
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      '실시간 업데이트',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
+              // Status Indicator
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildSmallInfoCard(
-                    '버스',
-                    '${provider.buses.length}대',
-                    Icons.directions_bus_rounded,
-                    Colors.white,
-                    Colors.blue.shade800,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF00C853),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF00C853).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'LIVE',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  _buildSmallInfoCard(
-                    '정류장',
-                    '${provider.busStops.length}개',
-                    Icons.location_on_rounded,
-                    Colors.white,
-                    Colors.blue.shade800,
-                  ),
-                  _buildSmallInfoCard(
-                    '노선',
-                    '${provider.busRoutes.length}개',
-                    Icons.route_rounded,
-                    Colors.white,
-                    Colors.blue.shade800,
+                  const Spacer(),
+                  Text(
+                    'System Status',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              // 검색 바
+              
+              const SizedBox(height: 24),
+              
+              // Metrics Cards
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildMetricCard(
+                      'Active Buses',
+                      '${provider.buses.length}',
+                      Icons.directions_bus_rounded,
+                      const Color(0xFF2196F3),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildMetricCard(
+                      'Bus Stops',
+                      '${provider.busStops.length}',
+                      Icons.location_on_rounded,
+                      const Color(0xFF4CAF50),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildMetricCard(
+                      'Routes',
+                      '${provider.busRoutes.length}',
+                      Icons.route_rounded,
+                      const Color(0xFFFF9800),
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Professional Search Bar
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
                 child: TextField(
                   decoration: InputDecoration(
-                    hintText: '정류장, 버스 번호 검색...',
-                    hintStyle: TextStyle(color: Colors.grey.shade500),
-                    prefixIcon: Icon(Icons.search_rounded, color: Colors.grey.shade600),
+                    hintText: 'Search stations, routes, or buses...',
+                    hintStyle: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    prefixIcon: Container(
+                      padding: const EdgeInsets.all(12),
+                      child: Icon(
+                        Icons.search_rounded,
+                        color: Colors.grey.shade600,
+                        size: 20,
+                      ),
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   ),
                   onChanged: (query) {
                     if (query.isNotEmpty) {
@@ -379,43 +529,60 @@ class _BusInfoHomePageState extends State<BusInfoHomePage> {
           ),
         ),
         
-        // 탭 컨트롤
+        // Professional Tab Navigation
         Expanded(
           child: DefaultTabController(
             length: 3,
             child: Column(
               children: [
                 Container(
+                  margin: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 2,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color(0xFFE2E8F0),
+                      width: 1,
+                    ),
                   ),
                   child: TabBar(
-                    labelColor: Colors.blue.shade700,
-                    unselectedLabelColor: Colors.grey.shade600,
-                    indicatorColor: Colors.blue.shade700,
-                    indicatorWeight: 3,
-                    tabs: [
+                    labelColor: const Color(0xFF0D47A1),
+                    unselectedLabelColor: const Color(0xFF64748B),
+                    indicator: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    indicatorPadding: const EdgeInsets.all(4),
+                    labelStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    unselectedLabelStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    tabs: const [
                       Tab(
-                        icon: Icon(Icons.route_rounded),
-                        text: '노선',
-                        iconMargin: const EdgeInsets.only(bottom: 4),
+                        icon: Icon(Icons.route_rounded, size: 20),
+                        text: 'Routes',
+                        iconMargin: EdgeInsets.only(bottom: 4),
                       ),
                       Tab(
-                        icon: Icon(Icons.directions_bus_rounded),
-                        text: '버스',
-                        iconMargin: const EdgeInsets.only(bottom: 4),
+                        icon: Icon(Icons.directions_bus_rounded, size: 20),
+                        text: 'Buses',
+                        iconMargin: EdgeInsets.only(bottom: 4),
                       ),
                       Tab(
-                        icon: Icon(Icons.location_on_rounded),
-                        text: '정류장',
-                        iconMargin: const EdgeInsets.only(bottom: 4),
+                        icon: Icon(Icons.location_on_rounded, size: 20),
+                        text: 'Stops',
+                        iconMargin: EdgeInsets.only(bottom: 4),
                       ),
                     ],
                   ),
@@ -437,47 +604,49 @@ class _BusInfoHomePageState extends State<BusInfoHomePage> {
     );
   }
 
-  Widget _buildSmallInfoCard(String title, String value, IconData icon, Color iconColor, Color backgroundColor) {
+  Widget _buildMetricCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(
+          color: Colors.white.withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
+              color: color.withOpacity(0.2),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: iconColor, size: 24),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 20,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
-            title,
-            style: TextStyle(
-              fontSize: 11,
-              color: iconColor,
-              fontWeight: FontWeight.w500,
+            value,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 2),
           Text(
-            value,
+            title,
             style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: iconColor,
+              fontSize: 10,
+              color: Colors.white.withOpacity(0.8),
+              fontWeight: FontWeight.w500,
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -487,22 +656,36 @@ class _BusInfoHomePageState extends State<BusInfoHomePage> {
   Widget _buildRoutesTab(BusProvider provider) {
     return Column(
       children: [
-        // 전체 선택/해제 버튼
+        // Professional Control Bar
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Color(0xFFF8FAFC),
+            border: Border(
+              bottom: BorderSide(
+                color: Color(0xFFE2E8F0),
+                width: 1,
+              ),
+            ),
+          ),
           child: Row(
             children: [
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: provider.showAllRoutes,
-                  icon: const Icon(Icons.visibility, size: 18),
-                  label: const Text('전체 표시'),
+                  icon: const Icon(Icons.visibility_rounded, size: 16),
+                  label: const Text('Show All'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade600,
+                    backgroundColor: const Color(0xFF10B981),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -511,14 +694,19 @@ class _BusInfoHomePageState extends State<BusInfoHomePage> {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: provider.hideAllRoutes,
-                  icon: const Icon(Icons.visibility_off, size: 18),
-                  label: const Text('전체 숨김'),
+                  icon: const Icon(Icons.visibility_off_rounded, size: 16),
+                  label: const Text('Hide All'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.shade600,
+                    backgroundColor: const Color(0xFF6B7280),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
