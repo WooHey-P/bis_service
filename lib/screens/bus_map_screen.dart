@@ -177,7 +177,7 @@ class _BusMapScreenState extends State<BusMapScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.black40,
+                      color: Colors.black45,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -231,28 +231,6 @@ class _BusMapScreenState extends State<BusMapScreen> {
             ],
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(String title, String value, IconData icon, Color color) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            Text(
-              value,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
       ),
     );
   }
