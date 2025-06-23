@@ -13,7 +13,6 @@
 .pub/
 .idea
 # Flutter build output
-build/
 !build/web/
 
 coverage/
