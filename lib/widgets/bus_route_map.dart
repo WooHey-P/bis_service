@@ -100,10 +100,11 @@ class BusRouteMap extends StatelessWidget {
     return Marker(
       point: LatLng(bus.latitude, bus.longitude),
       width: 70,
-      height: 100,
+      height: 85,
       child: Tooltip(
         message: '${bus.routeNumber}번 버스\n상태: ${bus.status}\n노선: ${_getRouteName(bus.routeNumber)}',
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             // 버스 번호를 가로로 한줄로 표시
             Container(
@@ -129,7 +130,7 @@ class BusRouteMap extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Container(
               decoration: BoxDecoration(
                 boxShadow: [
@@ -141,17 +142,17 @@ class BusRouteMap extends StatelessWidget {
                 ],
               ),
               child: CustomIcons.busIcon(
-                size: 55,
+                size: 50,
                 color: _getBusColor(bus.routeNumber),
                 routeNumber: null, // 버스 아이콘에서는 번호를 제거
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: bus.status == '운행중' ? Colors.green : Colors.orange,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.2),
@@ -163,7 +164,7 @@ class BusRouteMap extends StatelessWidget {
               child: Text(
                 bus.status,
                 style: const TextStyle(
-                  fontSize: 9,
+                  fontSize: 8,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
