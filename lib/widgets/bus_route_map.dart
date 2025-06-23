@@ -100,11 +100,36 @@ class BusRouteMap extends StatelessWidget {
     return Marker(
       point: LatLng(bus.latitude, bus.longitude),
       width: 70,
-      height: 90,
+      height: 100,
       child: Tooltip(
         message: '${bus.routeNumber}번 버스\n상태: ${bus.status}\n노선: ${_getRouteName(bus.routeNumber)}',
         child: Column(
           children: [
+            // 버스 번호를 가로로 한줄로 표시
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: _getBusColor(bus.routeNumber),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Text(
+                bus.routeNumber,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 4),
             Container(
               decoration: BoxDecoration(
                 boxShadow: [
@@ -118,7 +143,7 @@ class BusRouteMap extends StatelessWidget {
               child: CustomIcons.busIcon(
                 size: 55,
                 color: _getBusColor(bus.routeNumber),
-                routeNumber: bus.routeNumber,
+                routeNumber: null, // 버스 아이콘에서는 번호를 제거
               ),
             ),
             const SizedBox(height: 4),
